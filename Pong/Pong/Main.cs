@@ -16,15 +16,20 @@ namespace Pong
     /// </summary>
     public class Main : Microsoft.Xna.Framework.Game
     {
-        private static GraphicsDeviceManager _graphics;
+        private static GraphicsDeviceManager MainGraphics;
         private static SpriteBatch _spriteBatch;
+        private Viewport _viewport;
+
+        private static int _windowWidth;
+        private static int _windowHeight;
 
         private Player _player1 = new Player(Player.Side.left, Color.Red);
         private Player _player2 = new Player(Player.Side.right, Color.Blue);
+        private Ball _ball = new Ball();
 
         public Main()
         {
-            _graphics = new GraphicsDeviceManager(this);
+            MainGraphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
 
@@ -48,10 +53,16 @@ namespace Pong
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
+            _viewport = Main.MainGraphics.GraphicsDevice.Viewport;
+
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            _player1.Load();
+            _windowWidth = _viewport.Width;
+            _windowHeight = _viewport.Height;
 
+            _player1.Load();
+            _player2.Load();
+            _ball.Load();
             // TODO: use this.Content to load your game content here
         }
 
@@ -75,6 +86,11 @@ namespace Pong
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
+            _player1.Update();
+            _player2.Update();
+            _ball.Update(_player1); //fix this
+            _ball.Update(_player2);
+           
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -86,9 +102,11 @@ namespace Pong
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             _player1.Draw();
+            _player2.Draw();
+            _ball.Draw();
 
             // TODO: Add your drawing code here
 
@@ -102,7 +120,17 @@ namespace Pong
 
         public static GraphicsDeviceManager Graphics
         {
-            get { return _graphics; }
+            get { return MainGraphics; }
+        }
+
+        public static int WindowWidth
+        {
+            get { return _windowWidth; }
+        }
+
+        public static int WindowHeight
+        {
+            get { return _windowHeight; }
         }
     }
 }
